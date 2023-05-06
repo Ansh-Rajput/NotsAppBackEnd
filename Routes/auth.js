@@ -23,6 +23,7 @@ router.post("/createUser",[
       }),
     body("password","Enter password of length minium 5.").isLength({min:5})
 ],async (req,res)=>{
+    let status = false;
     const result = validationResult(req);
     const salt = await bcrypt.genSalt(10);
     const secPass = await bcrypt.hash(req.body.password,salt);
@@ -36,11 +37,12 @@ router.post("/createUser",[
         }
         const token = jwt.sign(data,process.env.PRIVATEKEY);
         // console.log(token);
-        console.log(req.body);
-        res.json({token});
+        // console.log(req.body);
+        status = true;
+        res.json({token,status});
     }
     else{
-      res.json({error:"Not a Valid Input."})
+      res.json({error:"Not a Valid Input.",status:status})
     }
 })
 
@@ -50,6 +52,7 @@ router.post("/login",[
   body("email","Entering eamil is  necessary").isEmail(),
   body("password","Enter password of length minium 5.").isLength({min:5})
 ],async (req,res)=>{
+  let status = false;
   const result = validationResult(req);
   const {email,password} = req.body;
   if (result.isEmpty()) {
@@ -64,7 +67,8 @@ router.post("/login",[
           }
           const token = jwt.sign(data,process.env.PRIVATEKEY);
           console.log(token);
-          res.json({token});
+          status=true;
+          res.json({token,status});
         }
       }
       else{
@@ -72,7 +76,7 @@ router.post("/login",[
       }
   }
   else{
-    res.json({error:"Not a Valid Input."})
+    res.json({error:"Not a Valid Input.",status:status})
   }
 })
 
